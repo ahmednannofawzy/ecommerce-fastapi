@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  # خدمة قاعدة البيانات MySQL
+  db:
+    image: mysql:8.0
+    container_name: ecommerce_db_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # خدمة تطبيق FastAPI
+  web:
+    build: .
+    container_name: ecommerce_api_container
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # داخل الحاوية: يتصل بـ db وعلى البورت الداخلي 3306
+      - DATABASE_URL=mysql+pymysql://ahmed:ahmednanno2510@db:3306/ecommerce_db
+    depends_on:
+      - db
+
+volumes:
+  mysql_data:
